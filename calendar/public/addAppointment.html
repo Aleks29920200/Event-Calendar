@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SkillSharing</title>
+    <link rel="stylesheet" href="css/reset-css.css"/>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <script src="js/jquery-3.5.1.slim.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        
+        .cutout-form {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.5); 
+            border-radius: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Cut-out form input */
+        form {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: transparent; 
+        }
+
+        
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(5px); 
+        }
+
+        
+        input[type="submit"] {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 10px;
+            color: #333;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        header,input{
+            font-size: 100px;
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://t4.ftcdn.net/jpg/02/16/94/65/360_F_216946587_rmug8FCNgpDCPQlstiCJ0CAXJ2sqPRU7.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-clip: text; 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+    </style>
+</head>
+<body style="background-color: aqua;">
+<header style="text-transform: uppercase;">Add your event</header>
+<div style="background-color: aqua;"></div>
+    <div>
+        <form class="form-group" id="appointmentForm" name="appointmentForm">
+                <div>
+                    <label for="meet">
+                        <input id="meet" name="meet" type="text" placeholder="Enter event name">
+                        <input type="time" id="time">
+                    </label>
+                </div>
+                <div class="form-group text-center">
+                    <input id="removeButton" class="btn btn-primary" value="Remove Event" type="button" onclick="removeValue()">
+                    <input id="addButton" class="btn btn-primary" value="Add/Edit Event" type="button" onclick="addEvent()">
+                </div>
+        </form>
+    </div>
+</header>
+<script>
+    function removeEvent() {
+        const selectedDate = localStorage.getItem("selectedDate");
+        localStorage.removeItem(selectedDate + 'my');
+        opener.location.reload();
+        window.close();
+    }
+
+    function addEvent() {
+        const selectedDate = localStorage.getItem("selectedDate");
+        const eventText = document.getElementById('meet').value;
+        const eventTime = document.getElementById('time').value;
+        const fullEvent = `${eventText} at ${eventTime}`;
+        localStorage.setItem(selectedDate + 'my', fullEvent);
+        opener.location.reload();
+        window.close();
+    }
+</script>
+</body>
+</html>
