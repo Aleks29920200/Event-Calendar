@@ -3,19 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>SkillSharing</title>
-    <link rel="stylesheet" href="css/reset-css.css"/>
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/main.css"/>
-    <script src="js/jquery-3.5.1.slim.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <style>
         * {
     margin: 0;
     padding: 0;
     font-family: 'Poppins', sans-serif;
 }
-
 body {
     display: flex;
     background: url("https://mcdn.wallpapersafari.com/medium/0/35/hyuS21.jpg");
@@ -26,10 +20,8 @@ body {
 }
 
 .calendar-container {
-    background: sandybrown;
+    background: transparent;
     width: 1200px;
-    border-radius: 10px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
 .calendar-container header {
@@ -87,11 +79,11 @@ header .calendar-current-date {
 .calendar-body li {
     width: calc(100% / 7);
     font-size: 1.07rem;
-    color: #414141;
+    color: royalblue
 }
 
 .calendar-body .calendar-weekdays li {
-    cursor: default;
+    cursor:all-scroll;
     font-weight: 500;
 }
 
@@ -124,6 +116,7 @@ header .calendar-current-date {
 
 .calendar-dates li.active::before {
     background: #6332c5;
+
 }
 
 .calendar-dates li:not(.active):hover::before {
@@ -131,35 +124,29 @@ header .calendar-current-date {
 }
     </style>
 </head>
-<body>
+<body id="wholeCalendar">
     <div class="calendar-container">
-        <header class="calendar-header">
+        <header>
             <p class="calendar-current-date"></p>
             <div class="calendar-navigation">
-                <span id="calendar-prev" class="material-symbols-rounded">
-                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M2.117 12l7.527 6.235-.644.765-9-7.521 9-7.479.645.764-7.529 6.236h21.884v1h-21.883z"/></svg>
-                </span>
-                <span id="calendar-next" class="material-symbols-rounded">
-                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/></svg>
-                </span>
+                <span id="calendar-prev">&lt;</span>
+                <span id="calendar-next">&gt;</span>
             </div>
         </header>
-        <form id="form_date" name="form_date" method="post">
-            <input type="hidden" id="dateOfMeet" value="" name="dateOfMeet">
-        </form>
         <div class="calendar-body">
             <ul class="calendar-weekdays">
-                <li id="sun">Sun</li>
-                <li id="mon">Mon</li>
-                <li id="tue">Tue</li>
-                <li id="wed">Wed</li>
-                <li id="thu">Thu</li>
-                <li id="fri">Fri</li>
-                <li id="sat">Sat</li>
+                <li>Sun</li>
+                <li>Mon</li>
+                <li>Tue</li>
+                <li>Wed</li>
+                <li>Thu</li>
+                <li>Fri</li>
+                <li>Sat</li>
             </ul>
             <ul id="calendar-dates" class="calendar-dates"></ul>
         </div>
     </div>
+    
     <script>
         let date = new Date();
         let year = date.getFullYear();
@@ -172,25 +159,23 @@ header .calendar-current-date {
         function openAppointmentPopup(day, month, year) {
             window.open('addAppointment.html', 'popUpWindow', 'height=500,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
             localStorage.setItem("selectedDate", day + " " + month + " " + year);
-            localStorage.setItem("selectedDay", day);
         }
     
-        function loadEventsFromLocalStorage() {
-            const calendarDays = document.querySelectorAll(".calendar-dates li");
-            calendarDays.forEach(function (day) {
-                const eventKey = day.id + 'my';
-                const eventContent = localStorage.getItem(eventKey);
-                if (eventContent) {
-                    const eventNode = document.createElement("ul");
-                    const eventItem = document.createElement("li");
-                    eventItem.textContent = eventContent;
-                    eventNode.appendChild(eventItem);
-                    day.appendChild(eventNode);
+        function loadEventsFromLocalStorage(selectedDate) {
+            let events = localStorage.getItem(`${selectedDate}my`);
+            if (!events || events === "undefined" || events === "null" || events.trim() === "") {
+                return []; 
+            } else {
+                try {
+                    return JSON.parse(events); 
+                } catch (e) {
+                    console.error("Invalid JSON found in localStorage. Resetting events.");
+                    return [];
                 }
-            });
+            }
         }
     
-        const generateCalendar = () => {
+        function generateCalendar() {
             let dayOne = new Date(year, month, 1).getDay();
             let lastDate = new Date(year, month + 1, 0).getDate();
             let lastMonthDate = new Date(year, month, 0).getDate();
@@ -198,24 +183,67 @@ header .calendar-current-date {
             let lit = "";
     
             for (let i = dayOne; i > 0; i--) {
-                lit += `<li id="${(lastMonthDate - i + 1) + ' ' + (month) + ' ' + year}" class="inactive" ondblclick="openAppointmentPopup(${lastMonthDate - i + 1}, ${month}, ${year})">${lastMonthDate - i + 1}</li>`;
+                lit += `<li class="inactive" ondblclick="openAppointmentPopup(${lastMonthDate - i + 1}, ${month}, ${year})">${lastMonthDate - i + 1}</li>`;
             }
     
             for (let i = 1; i <= lastDate; i++) {
                 let isToday = i === date.getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? "active" : "";
-                lit += `<li class="${isToday}" id="${i + ' ' + (month + 1) + ' ' + year}" ondblclick="openAppointmentPopup(${i}, ${month + 1}, ${year})">${i}</li>`;
+                let selectedDate = i + " " + (month + 1) + " " + year;
+                lit += `<li class="${isToday}" ondblclick="openAppointmentPopup(${i}, ${month + 1}, ${year})">
+                            ${i}
+                            <ul id="events-${selectedDate}"></ul>
+                        </li>`;
             }
     
             for (let i = endDay; i < 6; i++) {
-                lit += `<li class="inactive" id="${(i - endDay + 1) + ' ' + (month + 2) + ' ' + year}" ondblclick="openAppointmentPopup(${i - endDay + 1}, ${month + 2}, ${year})">${i - endDay + 1}</li>`;
+                lit += `<li class="inactive" ondblclick="openAppointmentPopup(${i - endDay + 1}, ${month + 2}, ${year})">${i - endDay + 1}</li>`;
             }
-    
+
+            if(month===0){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/530303/pexels-photo-530303.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }
+            else if(month==1){
+                document.getElementById("wholeCalendar").style="background-image:url('https://images.pexels.com/photos/10314132/pexels-photo-10314132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');"
+            }else if(month==2){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/813872/pexels-photo-813872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==3){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/443420/pexels-photo-443420.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==4){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/2876645/pexels-photo-2876645.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==5){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/33044/sunflower-sun-summer-yellow.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==6){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/450038/pexels-photo-450038.jpeg')";
+            }else if(month==7){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg')";
+            }else if(month==8){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/67566/palm-tree-palm-ocean-summer-67566.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==9){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==10){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/640809/pexels-photo-640809.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }else if(month==11){
+                document.getElementById("wholeCalendar").style.backgroundImage="url('https://images.pexels.com/photos/572897/pexels-photo-572897.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')";
+            }
             currdate.innerText = `${months[month]} ${year}`;
             day.innerHTML = lit;
-    
-            
-            loadEventsFromLocalStorage();
-        };
+
+            const calendarDays = document.querySelectorAll(".calendar-dates li");
+            calendarDays.forEach(function (day) {
+                const selectedDate = day.textContent.trim() + " " + (month + 1) + " " + year;
+                const events = loadEventsFromLocalStorage(selectedDate);
+
+                const eventsContainer = document.getElementById(`events-${selectedDate}`);
+                eventsContainer.innerHTML = '';
+                events.forEach(event => {
+                    const eventItem = document.createElement("li");
+                    eventItem.style = "background: transparent;  padding-right: 100px; color: purple;text-align: center";
+                    eventItem.textContent = "Event name"+event.name + 
+                    "\nTime: " + event.time;
+                    eventsContainer.appendChild(eventItem);
+                });
+            });
+        }
     
         generateCalendar();
     
@@ -232,6 +260,6 @@ header .calendar-current-date {
                 generateCalendar();
             });
         });
-    </script>
-    </body>
+    </script>    
+</body>
 </html>
