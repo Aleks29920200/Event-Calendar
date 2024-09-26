@@ -130,7 +130,7 @@
 
         function selectEvent(eventItem) {
             const selectedItems = document.querySelectorAll('.event-item');
-            selectedItems.forEach(item => item.style.backgroundColor = '#f8f9fa'); // Reset background
+            selectedItems.forEach(item => item.style.backgroundColor = '#f8f9fa');
 
             eventItem.style.backgroundColor = '#d6e9f5';
             localStorage.setItem('selectedEventIndex', eventItem.dataset.index); 
