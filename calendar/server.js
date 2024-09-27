@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 
 
 app.get('/add-appointment', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'addAppointment.html'));
+  res.sendFile(path.join(__dirname, 'public', 'eventHandler.html'));
 });
 
 
