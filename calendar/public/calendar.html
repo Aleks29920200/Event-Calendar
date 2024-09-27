@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Event-Callendar</title>
+    <title></title>
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <style>
-        * {
+           * {
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif;
 }
 body {
     display: flex;
-    background: url("https://mcdn.wallpapersafari.com/medium/0/35/hyuS21.jpg");
+    background-color: coral;
     min-height: 100vh;
     padding: 0 10px;
     align-items: center;
@@ -79,11 +78,11 @@ header .calendar-current-date {
 .calendar-body li {
     width: calc(100% / 7);
     font-size: 1.07rem;
-    color: royalblue
+    color: royalblue;
 }
 
 .calendar-body .calendar-weekdays li {
-    cursor:all-scroll;
+    cursor: all-scroll;
     font-weight: 500;
 }
 
@@ -116,16 +115,67 @@ header .calendar-current-date {
 
 .calendar-dates li.active::before {
     background: #6332c5;
-
 }
 
 .calendar-dates li:not(.active):hover::before {
     background: #e4e1e1;
 }
+
+.container {
+  position: relative;
+}
+
+.image {
+  display: block;
+  width: 100%;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: coral;
+  width: 100%;
+  transition: .5s ease;
+  opacity: 0;
+  padding: 20px;
+  text-align: bottom;
+}
+
+.container:hover .overlay {
+  opacity: 1;
+}
+
+.tab {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ccc;
+  margin-right: 10px;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab.active {
+  background-color: #333;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+  background-color: coral;
+}
+
+.tab-content.active {
+  display: block;
+}
     </style>
 </head>
-<body id="wholeCalendar">
-    <div class="calendar-container">
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="openTab(event, 'wholeCalendar')">Calendar</div>
+            <div class="tab" onclick="openTab(event, 'globalEvents')">Global Events</div>
+        </div>
+    <div id="wholeCalendar" class="calendar-container tab-content active" style="justify-content: flex-end;">
         <header>
             <p class="calendar-current-date"></p>
             <div class="calendar-navigation">
@@ -145,8 +195,37 @@ header .calendar-current-date {
             </ul>
             <ul id="calendar-dates" class="calendar-dates"></ul>
         </div>
+       
+        
     </div>
-    
+     <div id="globalEvents" class="tab-content">
+            <div id="availableEvents" >
+                <!-- Example Global Events -->
+                <div class="event-item container" onclick="selectGlobalEvent('Rio Carnival', '10 2 2024', '09:00', this)">
+                    <img src="https://www.rio-tickets.com/cdn/shop/files/WhatsApp_Image_2022-11-08_at_2.52.56_AM.jpg?v=1667898683&width=1280" alt="Rio Carnival">
+                    <div class="event-info overlay">
+                        <h4 >Rio Carnival</h4>
+                        <p><strong>Date:</strong> 2024-02-10</p>
+                        <p><strong>Time:</strong> 09:00</p>
+                        <p><strong>Location:</strong> Brazil</p>
+                        <p>The largest carnival in the world, full of vibrant parades, samba dancing, and street parties.</p>
+                    </div>
+                </div>
+
+                <div class="event-item container" onclick="selectGlobalEvent('Diwali Festival', '12 11 2024', '18:00', this)">
+                    <img src="https://people.com/thmb/-1Qzh0dM6aM1P03_JrZ1gmvPyG0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(749x99:751x101)/diwali-102022-3-05a455826c2f4a2b993740300f88f041.jpg" alt="Diwali Festival">
+                    <div class="event-info overlay">
+                        <h4>Diwali Festival</h4>
+                        <p><strong>Date:</strong> 2024-11-12</p>
+                        <p><strong>Time:</strong> 18:00</p>
+                        <p><strong>Location:</strong> India</p>
+                        <p>The festival of lights, symbolizing the victory of light over darkness and good over evil.</p>
+                    </div>
+                </div>
+        </div>
+        <button style="background-color: #6332c5;" onclick="confirmEvent()">Add to calendar</button>
+    </div>
+
     <script>
         let date = new Date();
         let year = date.getFullYear();
@@ -156,11 +235,11 @@ header .calendar-current-date {
         const prenexIcons = document.querySelectorAll(".calendar-navigation span");
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     
+        let selectedDate="";
         function openAppointmentPopup(day, month, year) {
-            window.open('eventHandler.html', 'popUpWindow', 'height=500,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+           window.open('addAppointment.html', 'popUpWindow', 'height=500,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
             localStorage.setItem("selectedDate", day + " " + month + " " + year);
         }
-    
         function loadEventsFromLocalStorage(selectedDate) {
             let events = localStorage.getItem(`${selectedDate}my`);
             if (!events || events === "undefined" || events === "null" || events.trim() === "") {
@@ -233,8 +312,8 @@ header .calendar-current-date {
                 const selectedDate = day.textContent.trim() + " " + (month + 1) + " " + year;
                 const events = loadEventsFromLocalStorage(selectedDate);
 
+
                 const eventsContainer = document.getElementById(`events-${selectedDate}`);
-                eventsContainer.innerHTML = '';
                 events.forEach(event => {
                     const eventItem = document.createElement("li");
                     eventItem.style = "background: transparent;  padding-right: 100px; color: purple;text-align: center";
@@ -260,6 +339,54 @@ header .calendar-current-date {
                 generateCalendar();
             });
         });
+        let selectedGlobalEvent = null;
+
+        function selectGlobalEvent(name, date, time, element) {
+            selectedGlobalEvent = { name, date, time };
+            selectedDate=date;
+            const selectedItems = document.querySelectorAll('.event-item');
+            selectedItems.forEach(item => item.style.backgroundColor = 'transparent');
+            element.style.backgroundColor = 'purple';
+        }
+
+        function confirmEvent() {
+            if (!selectedGlobalEvent) {
+                alert("Please select a global event to confirm.");
+                return;
+            }
+
+            const events = loadEvents();
+            const { name, date, time } = selectedGlobalEvent;
+            const eventExists = events.some(event => event.name === name && event.date === date && event.time === time);
+
+            if (eventExists) {
+                alert("This global event has already been added for the selected date.");
+            } else {
+                events.push({ name, date, time });
+                localStorage.setItem(`${selectedDate}my`, JSON.stringify(events));
+                alert(`${name} has been added to your personal events on ${selectedDate}.`);
+                selectedGlobalEvent = null;
+                open.document.loadEventList(); 
+            }
+        }
+        function loadEvents() {
+            let events = localStorage.getItem(`${selectedDate}my`);
+            return events ? JSON.parse(events) : [];
+        }
+        function openTab(evt, tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabs = document.querySelectorAll('.tab');
+
+            tabContents.forEach(tab => tab.classList.remove('active'));
+
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
     </script>    
 </body>
 </html>
+
